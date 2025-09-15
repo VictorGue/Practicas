@@ -4,15 +4,32 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.practicas.ui.theme.PracticasTheme
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,34 +38,95 @@ class MainActivity : ComponentActivity() {
             PracticasTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) }
-            Datos (
-                nombre = "Victor Hugo G",
-            )
+                    color = Color.Blue
+                ) {
+                    Greeting(
+                    )
+                }
+
+            }
         }
-     }
-   }
+    }
 
-@Composable
-fun Datos(
-    nombre : string,
-    modifier: Modifier = Modifier
-){
-    Text(
-        text = nombre,
-        fontSize = 40.sp,
-        color = Color(0xFF40E0D0)
-
-    )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun PreviewNameAndControl(){
-    PracticasTheme {
-        com.example.practicas.Datos(
-            nombre = "Victor Hugo G",
+fun Greeting() {
+    val context= LocalContext.current
+    var ValorA by remember { mutableStateOf("") }
+    var ValorB by remember { mutableStateOf("") }
+    var Resultado by remember { mutableStateOf("") }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+
+    ){
+        Text(
+            text = "Victor Hugo G",
+            style = MaterialTheme.typography.bodySmall
         )
+        Row(Modifier.padding(16.dp)){
+            OutlinedTextField(
+                value=ValorA,
+                label={Text("Valor 1:")},
+                onValueChange ={ValorA=it}
+            )
+        }
+        Row(
+            Modifier.align(Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            OutlinedButton(
+                onClick = {
+                    val a = ValorA.toInt()
+                    val b = ValorB.toInt()
+                    val c = a + b
+                    Resultado = c.toString()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.Blue
+                )
+            ) {
+                Text(text = "Suma")
+            }
+
+            OutlinedButton(
+                onClick = {
+                    Resultado = ""
+                },
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.Yellow
+                )
+            ) {
+                Text(text = "Borrar")
+            }
+        }
+
+        Row(
+            Modifier.align(Alignment.CenterHorizontally)
+        ) {
+
+        }
+        Row(
+            modifier= Modifier.padding(16.dp).
+            align(Alignment.CenterHorizontally)
+        ){
+            OutlinedTextField(
+                value = ValorB,
+                label={Text("Valor 2:")},
+                onValueChange ={ValorB=it}
+            )
+        }
+        Row(
+            modifier= Modifier.padding(16.dp).
+            align(Alignment.CenterHorizontally)
+        ){
+            OutlinedTextField(
+                value = Resultado,
+                label={Text("Resultado")},
+                onValueChange ={Resultado=it}
+            )
+        }
     }
 }
