@@ -177,7 +177,6 @@ fun CalculadoraSimple() {
         }
     }
 }
-
 @Composable
 fun BotonCalc(
     texto: String,
