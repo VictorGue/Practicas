@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
             PracticasTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.Blue
+                    color = Color.Green
                 ) {
                     Greeting(
                     )
@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting() {
     val context= LocalContext.current
-    var ValorA by remember { mutableStateOf("") }
-    var ValorB by remember { mutableStateOf("") }
+    var Valor1 by remember { mutableStateOf("") }
+    var Valor2 by remember { mutableStateOf("") }
     var Resultado by remember { mutableStateOf("") }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -66,11 +66,11 @@ fun Greeting() {
             text = "Victor Hugo G",
             style = MaterialTheme.typography.bodySmall
         )
-        Row(Modifier.padding(16.dp)){
+        Row(Modifier.padding(20.dp)){
             OutlinedTextField(
-                value=ValorA,
+                value=Valor1,
                 label={Text("Valor 1:")},
-                onValueChange ={ValorA=it}
+                onValueChange ={Valor1=it}
             )
         }
         Row(
@@ -79,13 +79,13 @@ fun Greeting() {
         ) {
             OutlinedButton(
                 onClick = {
-                    val a = ValorA.toInt()
-                    val b = ValorB.toInt()
+                    val a = Valor1.toInt()
+                    val b = Valor2.toInt()
                     val c = a + b
                     Resultado = c.toString()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Blue
+                    contentColor = Color.Transparent
                 )
             ) {
                 Text(text = "Suma")
@@ -96,10 +96,10 @@ fun Greeting() {
                     Resultado = ""
                 },
                 colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Yellow
+                    contentColor = Color.Blue
                 )
             ) {
-                Text(text = "Borrar")
+                Text(text = "BORRAR")
             }
         }
 
@@ -109,22 +109,22 @@ fun Greeting() {
 
         }
         Row(
-            modifier= Modifier.padding(16.dp).
+            modifier= Modifier.padding(20.dp).
             align(Alignment.CenterHorizontally)
         ){
             OutlinedTextField(
-                value = ValorB,
+                value = Valor2,
                 label={Text("Valor 2:")},
-                onValueChange ={ValorB=it}
+                onValueChange ={Valor2=it}
             )
         }
         Row(
-            modifier= Modifier.padding(16.dp).
+            modifier= Modifier.padding(20.dp).
             align(Alignment.CenterHorizontally)
         ){
             OutlinedTextField(
                 value = Resultado,
-                label={Text("Resultado")},
+                label={Text("Resultado:")},
                 onValueChange ={Resultado=it}
             )
         }
