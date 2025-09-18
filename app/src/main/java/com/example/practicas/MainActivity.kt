@@ -1,132 +1,200 @@
 package com.example.practicas
 
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.practicas.ui.theme.PracticasTheme
+
+
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        //enableEdgeToEdge
         setContent {
-            PracticasTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = Color.Blue
-                ) {
-                    Greeting(
-                    )
-                }
-
-            }
+            CalculadoraSimple()
         }
     }
-
 }
 
 @Composable
-fun Greeting() {
-    val context= LocalContext.current
-    var ValorA by remember { mutableStateOf("") }
-    var ValorB by remember { mutableStateOf("") }
-    var Resultado by remember { mutableStateOf("") }
+fun CalculadoraSimple() {
+    var textoPantalla by remember { mutableStateOf("0") }
+    var numeroGuardado by remember { mutableStateOf(0.0) }
+    var operacion by remember { mutableStateOf<String?>(null) }
+    var limpiarPantalla by remember { mutableStateOf(false) }
+
+
+    val fondo = Color.Red
+    val colorNumero = Color.Transparent
+    val colorOperador = Color.Black
+    val colorAccion = Color.Black
+    val colorIgual = Color.Black
+
+
+    fun escribirNumero(num: String) {
+        if (textoPantalla == "0" || limpiarPantalla) {
+            textoPantalla = num
+            limpiarPantalla = false
+        } else {
+            textoPantalla += num
+        }
+    }
+
+    fun limpiar() {
+        textoPantalla = "0"
+        numeroGuardado = 0.0
+        operacion = null
+        limpiarPantalla = false
+    }
+
+    fun borrar() {
+        textoPantalla = if (textoPantalla.length > 1) {
+            textoPantalla.dropLast(1)
+        } else "0"
+    }
+
+    fun elegirOperacion(op: String) {
+        numeroGuardado = textoPantalla.toDouble()
+        operacion = op
+        limpiarPantalla = true
+    }
+
+    fun calcular() {
+        val segundo = textoPantalla.toDouble()
+        val resultado = when (operacion) {
+            "+" -> numeroGuardado + segundo
+            "-" -> numeroGuardado - segundo
+            "*" -> numeroGuardado * segundo
+            "/" -> if (segundo != 0.0) numeroGuardado / segundo else Double.NaN
+            else -> segundo
+        }
+        textoPantalla = if (resultado.isNaN()) "Error" else resultado.toString()
+        numeroGuardado = resultado
+        operacion = null
+        limpiarPantalla = true
+    }
+
+
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxSize()
+            .background(fondo)
+            .padding(12.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
 
-    ){
-        Text(
-            text = "Victor Hugo G",
-            style = MaterialTheme.typography.bodySmall
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            Text(
+                text = textoPantalla,
+                color = Color.White,
+                fontSize = 48.sp,
+                textAlign = TextAlign.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+        }
+
+
+        Column(verticalArrangement = Arrangement.spacedBy(15.dp)) {
+
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BotonCalc("AC", colorAccion, Color.White, { limpiar() }, Modifier.weight(1f))
+                BotonCalc("⌫", colorAccion, Color.White, { borrar() }, Modifier.weight(1f))
+                BotonCalc("/", colorOperador, Color.White, { elegirOperacion("/") }, Modifier.weight(1f))
+            }
+
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BotonCalc("7", colorNumero, Color.White, { escribirNumero("7") }, Modifier.weight(1f))
+                BotonCalc("8", colorNumero, Color.White, { escribirNumero("8") }, Modifier.weight(1f))
+                BotonCalc("9", colorNumero, Color.White, { escribirNumero("9") }, Modifier.weight(1f))
+                BotonCalc("*", colorOperador, Color.White, { elegirOperacion("*") }, Modifier.weight(1f))
+            }
+
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BotonCalc("4", colorNumero, Color.White, { escribirNumero("4") }, Modifier.weight(1f))
+                BotonCalc("5", colorNumero, Color.White, { escribirNumero("5") }, Modifier.weight(1f))
+                BotonCalc("6", colorNumero, Color.White, { escribirNumero("6") }, Modifier.weight(1f))
+                BotonCalc("-", colorOperador, Color.White, { elegirOperacion("-") }, Modifier.weight(1f))
+            }
+
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BotonCalc("1", colorNumero, Color.White, { escribirNumero("1") }, Modifier.weight(1f))
+                BotonCalc("2", colorNumero, Color.White, { escribirNumero("2") }, Modifier.weight(1f))
+                BotonCalc("3", colorNumero, Color.White, { escribirNumero("3") }, Modifier.weight(1f))
+                BotonCalc("+", colorOperador, Color.White, { elegirOperacion("+") }, Modifier.weight(1f))
+            }
+
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BotonCalc("0", colorNumero, Color.White, { escribirNumero("0") }, Modifier.weight(1f))
+                BotonCalc(".", colorNumero, Color.White, {
+                    if (!textoPantalla.contains(".")) escribirNumero(".")
+                }, Modifier.weight(1f))
+                BotonCalc("=", colorIgual, Color.White, { calcular() }, Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+fun BotonCalc(
+    texto: String,
+    colorFondo: Color,
+    colorTexto: Color = Color.White,
+    alClic: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = alClic,
+        modifier = modifier.height(72.dp),
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colorFondo,
+            contentColor = colorTexto
         )
-        Row(Modifier.padding(16.dp)){
-            OutlinedTextField(
-                value=ValorA,
-                label={Text("Valor 1:")},
-                onValueChange ={ValorA=it}
-            )
-        }
-        Row(
-            Modifier.align(Alignment.CenterHorizontally),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            OutlinedButton(
-                onClick = {
-                    val a = ValorA.toInt()
-                    val b = ValorB.toInt()
-                    val c = a + b
-                    Resultado = c.toString()
-                },
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Blue
-                )
-            ) {
-                Text(text = "Suma")
-            }
-
-            OutlinedButton(
-                onClick = {
-                    Resultado = ""
-                },
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Yellow
-                )
-            ) {
-                Text(text = "Borrar")
-            }
-        }
-
-        Row(
-            Modifier.align(Alignment.CenterHorizontally)
-        ) {
-
-        }
-        Row(
-            modifier= Modifier.padding(16.dp).
-            align(Alignment.CenterHorizontally)
-        ){
-            OutlinedTextField(
-                value = ValorB,
-                label={Text("Valor 2:")},
-                onValueChange ={ValorB=it}
-            )
-        }
-        Row(
-            modifier= Modifier.padding(16.dp).
-            align(Alignment.CenterHorizontally)
-        ){
-            OutlinedTextField(
-                value = Resultado,
-                label={Text("Resultado")},
-                onValueChange ={Resultado=it}
-            )
-        }
+    ) {
+        Text(texto, fontSize = 26.sp, fontWeight = FontWeight.Medium)
     }
 }
