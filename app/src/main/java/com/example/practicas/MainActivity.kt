@@ -1,14 +1,17 @@
 package com.example.practicas
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import java.text.DecimalFormat
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,7 +42,7 @@ class MainActivity : ComponentActivity() {
             PracticasTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.Green
+                    color = Color.Magenta
                 ) {
                     Greeting(
                     )
@@ -50,82 +54,103 @@ class MainActivity : ComponentActivity() {
 
 }
 
+data class RangoISR(
+    val limiteInferior: Double,
+    val limiteSuperior: Double,
+    val cuotaFija: Double,
+    val tasa: Double
+)
+
+val rangosISR = listOf(
+    RangoISR(7641.91,   15412.80,   809.25,    0.2136),
+    RangoISR(15412.81,  24292.65,   2469.15,   0.2352),
+    RangoISR(24292.66,  46378.50,   4557.75,   0.3000),
+    RangoISR(46378.51,  61838.10,   11183.40,  0.3200),
+    RangoISR(61838.11,  185514.30,  16130.55,  0.3400),
+    RangoISR(185514.31, Double.MAX_VALUE, 58180.35, 0.3500)
+)
+
+fun calcularISRQuincenal(ingresoGravable: Double): Double {
+    if (ingresoGravable <= 0.0) return 0.0
+    val r = rangosISR.first { ingresoGravable >= it.limiteInferior && ingresoGravable <= it.limiteSuperior }
+    val excedente = ingresoGravable - r.limiteInferior
+    return r.cuotaFija + excedente * r.tasa
+}
+
 @Composable
 fun Greeting() {
-    val context= LocalContext.current
-    var Valor1 by remember { mutableStateOf("") }
-    var Valor2 by remember { mutableStateOf("") }
-    var Resultado by remember { mutableStateOf("") }
+    val contexto = LocalContext.current
+    var ingresoTexto by remember { mutableStateOf("") }
+    var isrTexto by remember { mutableStateOf("") }
+    var netoTexto by remember { mutableStateOf("") }
+
+    val formato = remember { DecimalFormat("#,##0.00") }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-
-    ){
-        Text(
-            text = "Victor Hugo G",
-            style = MaterialTheme.typography.bodySmall
-        )
-        Row(Modifier.padding(20.dp)){
+    ) {
+        Row {
+            Image(
+                painter = painterResource(id = R.drawable.satlogo),
+                contentDescription = null
+            )
+        }
+        Row(Modifier.padding(20.dp)) {
             OutlinedTextField(
-                value=Valor1,
-                label={Text("Valor 1:")},
-                onValueChange ={Valor1=it}
+                value = ingresoTexto,
+                label = { Text("Ingreso quincenal ($)") },
+                onValueChange = { ingresoTexto = it },
+                singleLine = true
             )
         }
         Row(
             Modifier.align(Alignment.CenterHorizontally),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             OutlinedButton(
                 onClick = {
-                    val a = Valor1.toInt()
-                    val b = Valor2.toInt()
-                    val c = a + b
-                    Resultado = c.toString()
+
+                    val ingreso = ingresoTexto.replace(",", "").toDoubleOrNull()
+                    if (ingreso == null) {
+                        Toast.makeText(contexto, "Ingrese una cantidad:", Toast.LENGTH_SHORT).show()
+                        return@OutlinedButton
+                    }
+
+                    val isr = calcularISRQuincenal(ingreso)
+                    val neto = ingreso - isr
+
+                    isrTexto = formato.format(isr)
+                    netoTexto = formato.format(neto)
                 },
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Transparent
-                )
-            ) {
-                Text(text = "Suma")
-            }
+                colors = ButtonDefaults.buttonColors(contentColor = Color.Black)
+            ) { Text("Calcular") }
 
             OutlinedButton(
                 onClick = {
-                    Resultado = ""
+                    ingresoTexto = ""
+                    isrTexto = ""
+                    netoTexto = ""
                 },
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Blue
-                )
-            ) {
-                Text(text = "BORRAR")
-            }
+                colors = ButtonDefaults.buttonColors(contentColor = Color.Black)
+            ) { Text("Borrar") }
         }
 
-        Row(
-            Modifier.align(Alignment.CenterHorizontally)
-        ) {
-
-        }
-        Row(
-            modifier= Modifier.padding(20.dp).
-            align(Alignment.CenterHorizontally)
-        ){
+        Row(modifier = Modifier.padding(20.dp).align(Alignment.CenterHorizontally)) {
             OutlinedTextField(
-                value = Valor2,
-                label={Text("Valor 2:")},
-                onValueChange ={Valor2=it}
+                value = isrTexto,
+                label = { Text("ISR ($)") },
+                onValueChange = { isrTexto = it },
+                singleLine = true
             )
         }
-        Row(
-            modifier= Modifier.padding(20.dp).
-            align(Alignment.CenterHorizontally)
-        ){
+        Row(modifier = Modifier.padding(20.dp).align(Alignment.CenterHorizontally)) {
             OutlinedTextField(
-                value = Resultado,
-                label={Text("Resultado:")},
-                onValueChange ={Resultado=it}
+                value = netoTexto,
+                label = { Text("NETO ($)") },
+                onValueChange = { netoTexto = it },
+                singleLine = true
             )
         }
     }
