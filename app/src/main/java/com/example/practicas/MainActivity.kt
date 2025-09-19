@@ -117,7 +117,6 @@ fun Greeting() {
                         Toast.makeText(contexto, "Ingrese una cantidad:", Toast.LENGTH_SHORT).show()
                         return@OutlinedButton
                     }
-
                     val isr = calcularISRQuincenal(ingreso)
                     val neto = ingreso - isr
 
